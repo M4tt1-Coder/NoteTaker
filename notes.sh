@@ -1,5 +1,3 @@
-# TODO - Create a github repository for this bash script
-
 # shellcheck disable=SC2148
 # Note script to handle CRUD operations with textfiles with notes to save and delete
 
@@ -347,8 +345,6 @@ save_changes () {
 	done
 }
 
-# TODO - All list items need to move one index so that there is no empty index in the list between items
-
 # Delete a note out of the list by using its index
 delete_note () {
 	if [ ${#ALL_NOTES[@]} -le 0 ]
@@ -357,7 +353,25 @@ delete_note () {
 		exit 1 
 	fi
 	unset "ALL_NOTES[$1]"
-	
+	# rearrange the list so that there is no empty index in the list
+	# loop over the whole the whole list
+	# when a index spot is empty -> move the next note to this empty index
+	# when there is no next note -> remove this empty index from the list
+	for (( i=0; i<${#ALL_NOTES[@]}; i++ ))
+	do 
+		if [[ "${ALL_NOTES[$i]}" = "" ]]
+		then
+			# remove the last index from the list when it is empty
+			if [ ${#ALL_NOTES[@]-1} -eq $i ]
+			then
+				unset "ALL_NOTES[$i]"
+				continue
+			fi
+			# assign the note of the next index to the index before
+			ALL_NOTES[i]="${ALL_NOTES[$i+1]}"
+			unset "ALL_NOTES[$i+1]"
+		fi
+	done
 }
 
 # https://www.baeldung.com/linux/clear-file-contents
