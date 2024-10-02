@@ -1,3 +1,4 @@
+# TODO - Add readme 
 # shellcheck disable=SC2148
 # Note script to handle CRUD operations with textfiles with notes to save and delete
 
@@ -83,6 +84,7 @@ serve_working_mode () {
 	read -r -p "-> " action_choice
 	# for modify and delete the user has to enter the note index in the list
 	
+
 	if [ "$action_choice" = "c"  ]
 	then 
 		serve_create_mode	
@@ -132,6 +134,8 @@ serve_working_mode () {
 		else 
 			serve_working_mode
 		fi
+	else
+		serve_working_mode
 	fi
 }
 
@@ -163,8 +167,13 @@ serve_delete_mode () {
 		sleep 4
 		delete_note "$index"
 		serve_working_mode
+	elif [[ "$delete_answer" == "n" ]]
+	then
+		clear 
+		echo "Won't delete the note at index $index!"
+		sleep 3
 	fi
-	# serve the working mode
+	serve_working_mode
 }
 
 # modify an existing note
@@ -202,9 +211,11 @@ serve_modify_mode () {
 	# -> S
 	# -> T
 
-	
+	# Counts how many iterations the user has used for entering the new note
+	iterationCount=1
+
 	while true
-	do 
+	do  
 		read -r -p "-> $NewNote : " input
 		if [ "$input" == "1" ]
 		then
@@ -240,7 +251,13 @@ serve_modify_mode () {
 			serve_working_mode
 			break
 		fi
-		NewNote+=$input
+		if [[ ${input:0:1} != " "  &&  "$iterationCount" != "1" ]]
+		then
+			NewNote+=" ${input}"
+		else
+			NewNote+=$input
+		fi
+		iterationCount+=$((iterationCount + 1))
 	done
 
 	if [ "$PreviousNote" -eq "$NewNote" ]
